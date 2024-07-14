@@ -1,6 +1,9 @@
-from app import db
 from flask_login import UserMixin
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+
+
+db = SQLAlchemy()
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +12,13 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     searches = db.relationship('UserSearch', backref='user', lazy=True)
     search_keywords = db.relationship('SearchKeyword', backref='user', lazy=True)
+
+    @staticmethod
+    def find_by_username(username):
+        return User.query.filter_by(username=username).first()
+
+    def __repr__(self):
+        return f"User('{self.username}', '{self.email}')"
 
 class SearchKeyword(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,3 +46,7 @@ class UserSearch(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     search_id = db.Column(db.Integer, db.ForeignKey('search_keyword.id'), nullable=False)
+
+
+def init_app(app):
+    db.init_app(app)

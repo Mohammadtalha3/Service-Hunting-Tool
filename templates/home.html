@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Please Enter Keyword</h1>
+    <form action="{{ url_for('home') }}" method="POST">
+        <div class="form-group">
+            <label for="keyword">Keyword:</label>
+            <input type="text" id="keyword" name="keyword" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    {% if results %}
+    <h2 class="mt-4">Results for "{{ request.form.get('keyword') }}":</h2>
+    <ul class="list-group">
+        {% for result in results %}
+        <li class="list-group-item">
+            <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+            <span class="badge badge-primary badge-pill">{{ result.price }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}
