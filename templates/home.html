@@ -10,6 +10,26 @@
             <label for="keyword">Keyword:</label>
             <input type="text" id="keyword" name="keyword" class="form-control" required>
         </div>
+        <div class="form-group">
+            <label for="seller_type">Seller Type:</label>
+            <select id="seller_type" name="seller_type" class="form-control">
+                <option value="">Select Seller Type</option>
+                <option value="top_rated_seller">Top Rated Seller</option>
+                <option value="level_two_seller">Level Two Seller</option>
+                <option value="level_one_seller">Level One Seller</option>
+                <option value="new_seller">New Seller</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="seller_country">Seller Country:</label>
+            <select id="seller_location" name="seller_country" class="form-control">
+                <option value="">Select Seller Country</option>
+                <option value="US">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="PK">Pakistan</option>
+                <!-- Add more countries as needed -->
+            </select>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
