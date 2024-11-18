@@ -38,7 +38,16 @@
     <ul class="list-group">
         {% for result in results %}
         <li class="list-group-item">
-            <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+            <!-- <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
+            <span class="badge badge-primary badge-pill">{{ result.price }}</span> -->
+            <h5><a href="{{ result.url }}" target="_blank">{{ result.title }}</a></h5>
+            <p><strong>Description:</strong> {{ result.description }}</p>
+            <p><strong>Sales:</strong> {{ result.sales }}</p>
+            <p><strong>Rating:</strong> {{ result.rating }}</p>
+            <p><strong>Industry:</strong> {{ result.industry }}</p>
+            <p><strong>Platform:</strong> {{ result.platform }}</p>
+            <p><strong>Last Delivery:</strong> {{ result.last_delivery }}</p>
+            <p><strong>Seller Rank:</strong> {{ result.seller_rank }}</p>
             <span class="badge badge-primary badge-pill">{{ result.price }}</span>
         </li>
         {% endfor %}

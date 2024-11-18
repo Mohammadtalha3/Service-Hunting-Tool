@@ -1,9 +1,0 @@
-flask
-pydantic
-BeautifulSoup4
-Scrapy
-Pandas
-Matplotlib
-Plotly
-TextBlob
-#-e .
