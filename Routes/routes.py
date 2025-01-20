@@ -6,6 +6,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 import bcrypt
 import requests
 import random   
+# from database_conf.db_config import redis_connect
+import json
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -19,6 +21,8 @@ import time
 from selenium.webdriver.common.action_chains import ActionChains
 from Model.db_models import db, SearchKeyword,Listing
 from datetime import datetime, timedelta
+import csv
+from Analysis.Data_Analysis import analyze_data,plot_sales_distribution,plot_focus_keywords,plot_unique_keywords_count,generate_wordcloud
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -156,16 +160,19 @@ def scrape_fiverr(keyword, seller_type=None, seller_country=None,search_id= None
                  try:
                      title_element = gig.query_selector('a > p')
                      title = title_element.inner_text().strip()
-                     print('title:', title)
+                    #  print('title:', title)
                      url = gig.query_selector('a').get_attribute('href')
                      price_element = gig.query_selector('a span span')
                      price = price_element.inner_text().strip().replace('\u00A0', ' ') if price_element else 'N/A'
-                     print('price:',price)
+                    #  print('price:',price)
                      rating_element = gig.query_selector('div.orca-rating strong.rating-score')
                      rating_score = rating_element.inner_text().strip() if rating_element else 'N/A'
+                    #  print('Rating', rating_score)
                      rating_count_element = gig.query_selector('div.orca-rating  span.rating-count-number')
                      rating_count = rating_count_element.inner_text().strip() if rating_count_element else 'N/A'
-                     last_delivery = datetime.utcnow() - timedelta(days=random.randint(1, 30))
+                    #  print('Raitng Count', rating_count)
+                    #  last_delivery = datetime.utcnow() - timedelta(days=random.randint(1, 30))
+                    #  print('last delivery', last_delivery)
                      seller= request.form.get('seller_type')
                      lissting= Listing(
                          search_id= search_id,
@@ -175,12 +182,21 @@ def scrape_fiverr(keyword, seller_type=None, seller_country=None,search_id= None
                          rating= rating_score,
                          industry= 'Technology',
                          platform= 'Fiverr',
-                         last_delivery= last_delivery,
+                        #  last_delivery= last_delivery,
                          seller_rank= seller
                      )
+                     
+                     
+
+                     
+
+                     
+
+
+                     
                      db.session.add(lissting)
                      db.session.commit()
-                     results.append({'title': title, 'url': url, 'price': price})
+                     results.append({'title': title, 'url': url, 'price': price, 'Rating': rating_score, 'RatingCount':rating_count})
                      human_like_delay()  # Add a delay between interactions
                  except Exception as e:
                      print(f"Error parsing gig: {e}")
@@ -210,23 +226,56 @@ def home():
              seller_type= seller_type,
              seller_country= seller_location
           )
-          db.session.add(search_keyword)
-          db.session.commit()
+        #   db.session.add(search_keyword)
+        #   db.session.commit()
           search_id= search_keyword.keywords
           print("this is a Searchid ++++++++++++++", search_id)
-          #scrape_fiverr(keyword, seller_type, seller_location,search_id)
-          #results = Listing.query.filter_by(search_id=search_id).all()
-          results = Listing.query.join(SearchKeyword).filter(SearchKeyword.keywords == search_id).all()
+          scrapped_data=scrape_fiverr(keyword, seller_type, seller_location,search_id)
+          print('this is scrapped data', scrapped_data)
 
-          if results:
-              return render_template('home.html', results=results)
+        #   redis_connect.redis_client.set('scraped_data', json.dumps(scrapped_data))
+
+          
+
+          analysis_results = analyze_data(scrapped_data)
+
+          print('This is analyzed data', analysis_results)
+
+
+        #   sales_chart = plot_sales_distribution(analysis_results['sales_distribution'])
+        #   rating_chart = plot_rating_distribution(analysis_results['rating_distribution'])
+          focus_keywords_chart = plot_focus_keywords(analysis_results['focus_keywords'])
+
+          
+          sales_distribution_chart = plot_sales_distribution(
+                analysis_results['low_sales_count'],
+                analysis_results['high_sales_count'])
+        #   unique_keywords_chart = plot_unique_keywords_count(analysis_results['unique_keywords'])
+          unique_keywords_cloud = generate_wordcloud(analysis_results['unique_keywords'])
+          context = {
+        'focus_keywords_chart': focus_keywords_chart,
+        'sales_distribution_chart': sales_distribution_chart,
+        'unique_keywords_cloud': unique_keywords_cloud,
+        }
+        # avg_rating_chart = plot_average_rating(analysis_results['avg_rating'])
+          #results = Listing.query.filter_by(search_id=search_id).all()
+        #   results = Listing.query.join(SearchKeyword).filter(SearchKeyword.keywords == search_id).all()
+
+        #avg_rating_chart=avg_rating_chart
+        
+
+    #   return render_template('home.html', sales_chart=sales_chart, rating_chart=rating_chart )
+    # ,sales_chart=sales_chart, rating_chart=rating_chart
+
+          if analysis_results:
+            return render_template('home.html',**context)
           
           else:
               results=scrape_fiverr(keyword, seller_type, seller_location,search_id)
-              return render_template('home.html', results=results)
+              analysis_results = analyze_data(results)
+
+              return render_template('home.html', results=analysis_results)
       return render_template('home.html')
-
-
 
 
 

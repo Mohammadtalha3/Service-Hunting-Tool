@@ -33,25 +33,29 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 
-    {% if results %}
-    <h2 class="mt-4">Results for "{{ request.form.get('keyword') }}":</h2>
-    <ul class="list-group">
-        {% for result in results %}
-        <li class="list-group-item">
-            <!-- <a href="{{ result.url }}" target="_blank">{{ result.title }}</a>
-            <span class="badge badge-primary badge-pill">{{ result.price }}</span> -->
-            <h5><a href="{{ result.url }}" target="_blank">{{ result.title }}</a></h5>
-            <p><strong>Description:</strong> {{ result.description }}</p>
-            <p><strong>Sales:</strong> {{ result.sales }}</p>
-            <p><strong>Rating:</strong> {{ result.rating }}</p>
-            <p><strong>Industry:</strong> {{ result.industry }}</p>
-            <p><strong>Platform:</strong> {{ result.platform }}</p>
-            <p><strong>Last Delivery:</strong> {{ result.last_delivery }}</p>
-            <p><strong>Seller Rank:</strong> {{ result.seller_rank }}</p>
-            <span class="badge badge-primary badge-pill">{{ result.price }}</span>
-        </li>
-        {% endfor %}
-    </ul>
+    {% if focus_keywords_chart %}
+    <h2 class="mt-4">Top Focus Keywords</h2>
+    <!-- Embed the focus keywords chart -->
+    <div class="chart">
+        {{ focus_keywords_chart|safe }}
+    </div>
     {% endif %}
-</div>
+
+    {% if sales_distribution_chart %}
+        <h2 class="mt-4">Sales Distribution</h2>
+        <!-- Embed the sales distribution chart -->
+        <div class="chart">
+            {{ sales_distribution_chart|safe }}
+        </div>
+    {% endif %}
+
+    {% if unique_keywords_cloud %}
+        <h2 class="mt-4">unique_keywords_cloud</h2>
+        <!-- Embed the unique keywords chart -->
+        <div class="chart">
+            {{ unique_keywords_cloud|safe }}
+        </div>
+    {% endif %}
+
+
 {% endblock %}
